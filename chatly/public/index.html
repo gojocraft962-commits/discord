@@ -45,11 +45,10 @@
   img.av { display: block; }
   .av.sm { width: 32px; height: 32px; font-size: 14px; }
   .av.xs { width: 24px; height: 24px; font-size: 12px; }
-  .av.big { width: 96px; height: 96px; font-size: 40px; }
+  .av.big { width: 120px; height: 120px; font-size: 48px; }
 
-  /* App */
+  /* Layout */
   #app { display: flex; height: 100%; }
-
   #rail { width: 72px; flex: none; background: var(--rail); display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0; overflow-y: auto; }
   #rail::-webkit-scrollbar { display: none; }
   .rlist { display: flex; flex-direction: column; gap: 8px; align-items: center; }
@@ -161,19 +160,45 @@
   #chatForm input::placeholder { color: var(--muted); }
   #emojiBtn { font-size: 22px; padding: 0 6px; }
 
-  #grid { flex: 1; overflow-y: auto; padding: 16px; display: grid; gap: 16px; align-content: center; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  .tile { position: relative; background: var(--card); border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; }
+  /* Voz e chamadas */
+  #voiceView { position: relative; }
+  #grid { flex: 1; overflow-y: auto; padding: 16px; display: grid; gap: 16px; align-content: center; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); min-height: 0; }
+  .tile { position: relative; background: var(--card); border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9; }
   .tile video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
-  .tile .avslot { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; }
-  .tile.off .avslot { display: flex; }
-  .tile.off video { display: none; }
-  .tile .lbl { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.6); padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #fff; }
+  .avslot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .tile .lbl { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.6); padding: 4px 8px; border-radius: 4px; font-size: 14px; color: #fff; z-index: 3; }
+  .tile.screen { z-index: 2; }
   #controls { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; flex-wrap: wrap; }
   .ctl { width: 48px; height: 48px; border-radius: 50%; background: var(--selected); font-size: 20px; display: grid; place-items: center; }
   .ctl:hover { filter: brightness(1.15); }
   .ctl.on { background: var(--accent); color: #fff; }
   .ctl.off { background: var(--red); color: #fff; }
   .ctl.hang { background: var(--red); color: #fff; width: 72px; border-radius: 24px; }
+
+  /* Modo chamada 1 a 1: pessoa em tela cheia, você num quadro pequeno */
+  #voiceView.dm #grid { display: block; position: relative; padding: 0; background: #000; overflow: hidden; }
+  #voiceView.dm .tile { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; background: #000; }
+  #voiceView.dm .tile.pip { inset: auto; width: 160px; height: 120px; right: 16px; bottom: 16px; border-radius: 12px; z-index: 5; border: 1px solid rgba(255,255,255,.2); }
+  #voiceView.dm #localScreenTile.pip { right: auto; left: 16px; width: 200px; height: 120px; }
+  #voiceView.dm .tile .avslot { background: var(--main); }
+  #voiceView.dm .tile .lbl { bottom: 96px; left: 16px; }
+  #voiceView.dm .tile.pip .lbl { display: none; }
+  #callHead { position: absolute; top: 0; left: 0; right: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 18px 16px 40px; background: linear-gradient(rgba(0,0,0,.6), transparent); color: #fff; text-align: center; pointer-events: none; }
+  #callHead b { font-size: 20px; }
+  #callHead span { font-size: 14px; opacity: .85; }
+  #voiceView.dm #controls { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
+
+  /* Tela de chamando / chamada recebida */
+  #callOverlay { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: linear-gradient(160deg, #1b1d24, #0b0c10); color: #fff; }
+  .co-box { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 24px; }
+  .co-name { font-size: 28px; font-weight: 700; margin-top: 12px; }
+  .co-text { font-size: 16px; opacity: .75; }
+  .co-btns { display: flex; gap: 40px; margin-top: 48px; }
+  .co-btn { width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; color: #fff; }
+  .co-btn.accept { background: var(--green); }
+  .co-btn.decline { background: var(--red); }
+  .co-label { font-size: 13px; opacity: .7; margin-top: 6px; }
+  .co-col { display: flex; flex-direction: column; align-items: center; }
 
   #members { width: 240px; flex: none; background: var(--side); overflow-y: auto; padding: 12px 8px; }
   .mem { display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 4px; }
@@ -194,7 +219,7 @@
   .theme { background: var(--card); padding: 10px; border-radius: 6px; display: flex; align-items: center; gap: 10px; color: var(--text2); border: 2px solid transparent; }
   .theme.on { border-color: var(--accent); }
   .sw { width: 28px; height: 28px; border-radius: 6px; flex: none; }
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); color: var(--text); padding: 12px 16px; border-radius: 8px; display: flex; gap: 14px; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,.4); z-index: 40; max-width: 92vw; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--card); color: var(--text); padding: 12px 16px; border-radius: 8px; display: flex; gap: 14px; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,.4); z-index: 70; max-width: 92vw; }
   .toast button { background: var(--accent); color: #fff; padding: 6px 12px; border-radius: 4px; }
 
   @media (max-width: 1000px) {
@@ -208,6 +233,8 @@
     .srv.active::before { left: -10px; }
     #side { position: fixed; left: 60px; top: 0; bottom: 0; width: min(260px, 80vw); z-index: 8; transform: translateX(-120%); transition: transform .2s; }
     #app.nav-open #side { transform: none; box-shadow: 4px 0 16px rgba(0,0,0,.4); }
+    #voiceView.dm .tile.pip { width: 110px; height: 80px; }
+    #voiceView.dm #localScreenTile.pip { width: 130px; height: 80px; }
   }
 </style>
 </head>
@@ -301,6 +328,7 @@
     </section>
 
     <section id="voiceView" hidden>
+      <div id="callHead" hidden><b id="callName"></b><span id="callTimer">Conectando…</span></div>
       <div id="grid">
         <div class="tile" id="localTile">
           <video id="localVid" autoplay muted playsinline></video>
@@ -317,12 +345,21 @@
         <button class="ctl" id="btnDeaf" title="Ensurdecer" onclick="toggleDeaf()">🎧</button>
         <button class="ctl" id="btnCam" title="Câmera" onclick="toggleCam()">📷</button>
         <button class="ctl" id="btnScreen" title="Compartilhar tela" onclick="toggleScreen()">🖥️</button>
-        <button class="ctl hang" title="Sair da chamada" onclick="leaveVoice()">📵</button>
+        <button class="ctl hang" title="Encerrar chamada" onclick="leaveVoice()">📵</button>
       </div>
     </section>
   </main>
 
   <aside id="members" hidden></aside>
+</div>
+
+<div id="callOverlay" hidden>
+  <div class="co-box">
+    <div id="coAv"></div>
+    <div class="co-name" id="coName"></div>
+    <div class="co-text" id="coText"></div>
+    <div class="co-btns" id="coBtns"></div>
+  </div>
 </div>
 
 <div id="settings" hidden>
@@ -359,7 +396,7 @@ const THEMES = [
   { id: 'floresta', name: 'Floresta', c: ['#1c3324', '#16a34a'] },
 ];
 const RTC = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-const canShare = !!navigator.mediaDevices?.getDisplayMedia;
+const canShare = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
 
 let state = null;
 let token = localStorage.getItem('chatly_token') || '';
@@ -372,37 +409,62 @@ let voiceRoom = null;
 let showVoice = false;
 let homeTab = 'online';
 let replyTo = null;
-let localStream = null, screenStream = null;
+let localStream = null;
+let screenStream = null;
 let micOn = true, camOn = true, deaf = false, micBeforeDeaf = false;
-const peers = new Map();     // sid -> { pc, tx, els, pending }
-const peerNames = new Map(); // sid -> usuário
+let joining = false;
+let incoming = null;   // { from, room } chamada recebida
+let outgoing = null;   // { to } chamada feita, aguardando resposta
+let callTimer = null, callStart = 0;
+const peers = new Map();       // sid -> { pc, tx: {audio, cam, screen}, els: [], pending: [] }
+const peerNames = new Map();   // sid -> nome
+const remoteMedia = new Map(); // sid -> { cam, screen }
 const msgCache = new Map();
 
 /* ---------- Utilidades ---------- */
-const colorOf = (n) => { let h = 0; for (const ch of String(n)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return COLORS[h % COLORS.length]; };
-const avatarOf = (n) => state?.people?.[n] || '';
+function colorOf(n) {
+  let h = 0;
+  for (const ch of String(n)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return COLORS[h % COLORS.length];
+}
+function avatarOf(n) { return (state && state.people && state.people[n]) || ''; }
 function av(name, cls = 'av') {
   const src = avatarOf(name);
   if (src) return `<img class="${cls}" src="${esc(src)}" alt="">`;
-  return `<div class="${cls}" style="background:${colorOf(name)}">${esc((name || '?').charAt(0).toUpperCase())}</div>`;
+  return `<div class="${cls}" style="background:${colorOf(name)}">${esc(String(name || '?').charAt(0).toUpperCase())}</div>`;
 }
-const hora = (t) => new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-const dmRoom = (name) => 'd:' + [state.me.username, name].sort().join('|');
-const otherOf = (room) => room.slice(2).split('|').find((x) => x !== state.me.username);
-const currentServer = () => state?.servers.find((s) => s.id === curServer);
+function hora(t) { return new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+function dmRoom(name) { return 'd:' + [state.me.username, name].sort().join('|'); }
+function otherOf(room) { return room.slice(2).split('|').find((x) => x !== state.me.username); }
+function currentServer() { return state && state.servers.find((s) => s.id === curServer); }
 function channelOf(room) {
-  if (!room?.startsWith('c:') || !state) return null;
+  if (!state || !room || !room.startsWith('c:')) return null;
   for (const s of state.servers) for (const c of s.channels) if ('c:' + c.id === room) return c;
   return null;
 }
-function setBtn(on, ...sels) { sels.forEach((sel) => document.querySelectorAll(sel).forEach((b) => b.classList.toggle('off', !on))); }
+function setBtn(on, ...sels) {
+  sels.forEach((sel) => document.querySelectorAll(sel).forEach((b) => b.classList.toggle('off', !on)));
+}
 function toast(text, btn, fn) {
   const t = document.createElement('div');
   t.className = 'toast';
   t.innerHTML = `<span>${esc(text)}</span><button>${esc(btn)}</button>`;
   t.querySelector('button').onclick = () => { fn(); t.remove(); };
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 20000);
+  setTimeout(() => t.remove(), 6000);
+}
+function showCam(tile, on) {
+  if (!tile) return;
+  const v = tile.querySelector('video');
+  const a = tile.querySelector('.avslot');
+  if (v) v.style.display = on ? 'block' : 'none';
+  if (a) a.style.display = on ? 'none' : 'flex';
+}
+function applyRemote(sid) {
+  const m = remoteMedia.get(sid) || { cam: false, screen: false };
+  showCam(document.getElementById('c-' + sid), m.cam);
+  const scr = document.getElementById('s-' + sid);
+  if (scr) scr.hidden = !m.screen;
 }
 
 /* ---------- Login ---------- */
@@ -416,7 +478,7 @@ function setAuthMode(m) {
 function submitAuth(e) {
   e.preventDefault();
   socket.emit(authMode, { username: $('#lu').value.trim(), password: $('#lp').value }, (r) => {
-    if (!r.ok) return ($('#authErr').textContent = r.error);
+    if (!r.ok) { $('#authErr').textContent = r.error; return; }
     token = r.token;
     localStorage.setItem('chatly_token', token);
     afterAuth();
@@ -444,7 +506,7 @@ function logout() {
 socket.on('connect', () => {
   if (!token) return;
   socket.emit('resume', { token }, (r) => {
-    if (!r.ok) {
+    if (!r || !r.ok) {
       token = '';
       localStorage.removeItem('chatly_token');
       return;
@@ -458,6 +520,8 @@ socket.on('disconnect', () => {
   cleanupVoice();
   voiceRoom = null;
   showVoice = false;
+  incoming = null;
+  outgoing = null;
   if (state) renderAll();
 });
 
@@ -466,14 +530,171 @@ socket.on('state', (s) => {
   document.documentElement.dataset.theme = s.me.theme;
   $('#userName').textContent = s.me.username;
   $('#userAv').innerHTML = av(s.me.username, 'av sm');
-  $('#localAv').innerHTML = av(s.me.username, 'av big');
   if (!$('#settings').hidden) openSettings();
   renderAll();
 });
 
-socket.on('ring', ({ from, room }) => toast(`📞 ${from} está ligando para você`, 'Atender', () => openRoom(room, true)));
 socket.on('peer-joined', ({ sid, name }) => peerNames.set(sid, name));
-socket.on('user-left', ({ sid }) => closePeer(sid));
+
+socket.on('user-left', ({ sid }) => {
+  const name = peerNames.get(sid) || 'A outra pessoa';
+  closePeer(sid);
+  // Em chamada 1 a 1, quando a outra pessoa sai, a chamada termina
+  if (voiceRoom && voiceRoom.startsWith('d:') && peers.size === 0) {
+    toast(`${name} saiu da chamada.`, 'OK', () => {});
+    leaveVoice();
+  }
+});
+
+/* ---------- Chamadas (estilo WhatsApp) ---------- */
+let ringTimer = null, ringCtx = null;
+function ringing(on) {
+  clearInterval(ringTimer);
+  ringTimer = null;
+  if (!on) return;
+  try {
+    ringCtx = ringCtx || new (window.AudioContext || window.webkitAudioContext)();
+    ringCtx.resume && ringCtx.resume();
+  } catch { ringCtx = null; }
+  const beep = () => {
+    if (!ringCtx) return;
+    const o = ringCtx.createOscillator();
+    const g = ringCtx.createGain();
+    o.frequency.value = 880;
+    g.gain.value = 0.15;
+    o.connect(g);
+    g.connect(ringCtx.destination);
+    o.start();
+    o.stop(ringCtx.currentTime + 0.4);
+  };
+  beep();
+  ringTimer = setInterval(beep, 1500);
+  if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+}
+
+function renderCallOverlay() {
+  const ov = $('#callOverlay');
+  if (!incoming && !outgoing) {
+    ov.hidden = true;
+    ringing(false);
+    return;
+  }
+  const name = incoming ? incoming.from : outgoing.to;
+  ov.hidden = false;
+  $('#coAv').innerHTML = av(name, 'av big');
+  $('#coName').textContent = name;
+  if (incoming) {
+    $('#coText').textContent = 'Chamada recebida';
+    $('#coBtns').innerHTML =
+      `<div class="co-col"><button class="co-btn decline" title="Recusar" onclick="declineCall()">📵</button><span class="co-label">Recusar</span></div>` +
+      `<div class="co-col"><button class="co-btn accept" title="Atender" onclick="acceptCall()">📞</button><span class="co-label">Atender</span></div>`;
+    ringing(true);
+  } else {
+    $('#coText').textContent = 'Chamando…';
+    $('#coBtns').innerHTML =
+      `<div class="co-col"><button class="co-btn decline" title="Cancelar" onclick="cancelCall()">📵</button><span class="co-label">Cancelar</span></div>`;
+    ringing(false);
+  }
+}
+
+function startCall(name) {
+  if (voiceRoom || incoming || outgoing) {
+    toast('Você já está em uma chamada.', 'OK', () => {});
+    return;
+  }
+  socket.emit('call-invite', { to: name }, (r) => {
+    if (!r || !r.ok) return toast(r ? r.error : 'Erro ao ligar.', 'OK', () => {});
+    outgoing = { to: name };
+    renderCallOverlay();
+  });
+}
+
+function callFriend(name) {
+  if (voiceRoom === dmRoom(name)) {
+    curServer = null;
+    curRoom = dmRoom(name);
+    showVoice = true;
+    renderAll();
+    return;
+  }
+  startCall(name);
+}
+
+function acceptCall() {
+  if (!incoming) return;
+  const { from, room } = incoming;
+  incoming = null;
+  renderCallOverlay();
+  curServer = null;
+  curRoom = room;
+  showVoice = true;
+  // Entra na sala primeiro e só depois avisa quem ligou, para evitar conexões duplicadas
+  joinVoice(room, () => socket.emit('call-accept', { from }, () => {}), () => {
+    socket.emit('call-decline', { from }, () => {});
+  });
+}
+
+function declineCall() {
+  if (!incoming) return;
+  const from = incoming.from;
+  incoming = null;
+  renderCallOverlay();
+  socket.emit('call-decline', { from }, () => {});
+}
+
+function cancelCall() {
+  outgoing = null;
+  renderCallOverlay();
+  socket.emit('call-cancel', {}, () => {});
+}
+
+socket.on('call-incoming', ({ from, room }) => {
+  if (voiceRoom || incoming || outgoing) {
+    socket.emit('call-decline', { from }, () => {});
+    return;
+  }
+  incoming = { from, room };
+  renderCallOverlay();
+});
+
+socket.on('call-accepted', ({ room }) => {
+  outgoing = null;
+  renderCallOverlay();
+  curServer = null;
+  curRoom = room;
+  showVoice = true;
+  joinVoice(room);
+});
+
+socket.on('call-declined', ({ by }) => {
+  outgoing = null;
+  renderCallOverlay();
+  toast(`${by} recusou a chamada.`, 'OK', () => {});
+});
+
+socket.on('call-missed', ({ from }) => {
+  const wasOutgoing = outgoing;
+  incoming = null;
+  outgoing = null;
+  renderCallOverlay();
+  if (wasOutgoing) toast(`${wasOutgoing.to} não atendeu.`, 'OK', () => {});
+  else toast(`Você perdeu uma chamada de ${from}.`, 'OK', () => {});
+});
+
+function startTimer() {
+  if (callTimer) return;
+  callStart = Date.now();
+  callTimer = setInterval(() => {
+    const s = Math.floor((Date.now() - callStart) / 1000);
+    $('#callTimer').textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(callTimer);
+  callTimer = null;
+  $('#callTimer').textContent = 'Conectando…';
+}
 
 /* ---------- Renderização ---------- */
 function renderAll() {
@@ -483,13 +704,24 @@ function renderAll() {
   renderTop();
   renderVisibility();
   renderMembers();
-  if (!curRoom) renderFriends();
+  renderFriends();
+  renderCallOverlay();
   $('#voiceBox').hidden = !voiceRoom;
   if (voiceRoom) {
-    const label = voiceRoom.startsWith('d:') ? '@' + otherOf(voiceRoom) : (channelOf(voiceRoom)?.name || 'Sala');
+    const label = voiceRoom.startsWith('d:') ? '@' + otherOf(voiceRoom) : (channelOf(voiceRoom) ? channelOf(voiceRoom).name : 'Sala');
     $('#voiceTitle').textContent = '🔊 ' + label;
   }
+  updateCallLayout();
   refreshVoiceButtons();
+}
+
+function updateCallLayout() {
+  const dm = !!voiceRoom && voiceRoom.startsWith('d:');
+  $('#voiceView').classList.toggle('dm', dm);
+  $('#callHead').hidden = !dm;
+  if (dm) $('#callName').textContent = otherOf(voiceRoom);
+  $('#localTile').classList.toggle('pip', dm);
+  $('#localScreenTile').classList.toggle('pip', dm);
 }
 
 function renderRail() {
@@ -500,7 +732,9 @@ function renderRail() {
 
 function renderSide() {
   const side = $('#sideList');
-  if (!curServer) {
+  const s = currentServer();
+  if (!s) {
+    curServer = null;
     $('#sideTitle').textContent = 'Mensagens diretas';
     side.innerHTML = state.friends.length
       ? state.friends.map((f) => {
@@ -512,39 +746,45 @@ function renderSide() {
       : '<div class="empty">Adicione amigos na aba Amigos.</div>';
     return;
   }
-  const s = currentServer();
-  if (!s) { curServer = null; return renderSide(); }
   $('#sideTitle').textContent = s.name;
-  const chanRow = (c) => `<div class="chan ${curRoom === 'c:' + c.id ? 'active' : ''}" onclick="openRoom('c:${c.id}')">
+  const row = (c) => `<div class="chan ${curRoom === 'c:' + c.id ? 'active' : ''}" onclick="openRoom('c:${c.id}')">
     <span class="hash">${c.type === 'voice' ? '🔊' : '#'}</span><span class="nm">${esc(c.name)}</span></div>`;
   side.innerHTML =
     `<div class="cat"><span>Canais de texto</span><button title="Novo canal de texto" onclick="createChannel('text')">+</button></div>` +
-    s.channels.filter((c) => c.type === 'text').map(chanRow).join('') +
+    s.channels.filter((c) => c.type === 'text').map(row).join('') +
     `<div class="cat"><span>Canais de voz</span><button title="Novo canal de voz" onclick="createChannel('voice')">+</button></div>` +
     s.channels.filter((c) => c.type === 'voice').map((c) =>
-      chanRow(c) + c.voice.map((u) => `<div class="vu">${av(u, 'av xs')}<span>${esc(u)}</span></div>`).join('')
+      row(c) + c.voice.map((u) => `<div class="vu">${av(u, 'av xs')}<span>${esc(u)}</span></div>`).join('')
     ).join('');
 }
 
 function renderTop() {
-  const dm = !!curRoom && curRoom.startsWith('d:');
+  const s = currentServer();
   let title = 'Amigos', hash = '👥';
   if (curRoom) {
-    if (dm) { title = otherOf(curRoom); hash = '@'; }
-    else { const ch = channelOf(curRoom); title = ch?.name || ''; hash = ch?.type === 'voice' ? '🔊' : '#'; }
+    if (curRoom.startsWith('d:')) { title = otherOf(curRoom); hash = '@'; }
+    else { const ch = channelOf(curRoom); title = ch ? ch.name : ''; hash = ch && ch.type === 'voice' ? '🔊' : '#'; }
+  } else if (s) {
+    title = s.name;
+    hash = '#';
   }
   $('#topTitle').textContent = title;
   $('#topHash').textContent = hash;
+  const dm = !!curRoom && curRoom.startsWith('d:');
   const inCall = dm && voiceRoom === curRoom;
   $('#callBtn').hidden = !dm;
   $('#callBtn').textContent = !inCall ? '📞 Ligar' : showVoice ? '💬 Chat' : '🔊 Chamada';
-  $('#membersBtn').hidden = !curServer || !curRoom;
+  $('#membersBtn').hidden = !s || !curRoom;
 }
 
 function renderVisibility() {
-  $('#friendsView').hidden = !!curRoom;
-  $('#textView').hidden = !curRoom || showVoice;
+  const home = !curRoom && !curServer;
+  $('#friendsView').hidden = !home;
+  $('#textView').hidden = !(curRoom ? !showVoice : !!curServer);
   $('#voiceView').hidden = !curRoom || !showVoice;
+  if (!curRoom && curServer) {
+    $('#msgs').innerHTML = '<div class="welcome"><p>Este servidor ainda não tem canais de texto. Crie um pelo botão + na barra lateral.</p></div>';
+  }
 }
 
 function renderMembers() {
@@ -553,12 +793,14 @@ function renderMembers() {
   box.hidden = !s || !curRoom;
   if (!s) return;
   const mem = (m) => `<div class="mem ${m.online ? '' : 'dim'}">${av(m.name, 'av sm')}<span>${esc(m.name)}</span></div>`;
-  const on = s.members.filter((m) => m.online), off = s.members.filter((m) => !m.online);
+  const on = s.members.filter((m) => m.online);
+  const off = s.members.filter((m) => !m.online);
   box.innerHTML = `<div class="mhead">Online — ${on.length}</div>` + on.map(mem).join('') +
     `<div class="mhead">Offline — ${off.length}</div>` + off.map(mem).join('');
 }
 
 function renderFriends() {
+  if (curRoom || curServer) return;
   document.querySelectorAll('.ftab').forEach((b) => b.classList.toggle('on', b.dataset.t === homeTab));
   $('#addBox').hidden = homeTab !== 'add';
   $('#fbody').hidden = homeTab === 'add';
@@ -580,7 +822,7 @@ function renderFriends() {
       <div class="frow">${av(f.name)}<div class="fname"><b>${esc(f.name)}</b>
         <small>${f.call ? 'Em chamada' : f.online ? 'Online' : 'Offline'}</small></div>
         <button class="rbtn" title="Mensagem" onclick="openDM('${f.name}')">💬</button>
-        <button class="rbtn" title="Ligar" onclick="openRoom('${dmRoom(f.name)}', true)">📞</button>
+        <button class="rbtn" title="Ligar" onclick="callFriend('${f.name}')">📞</button>
         <button class="rbtn" title="Remover amigo" onclick="friendAct('friend-remove','${f.name}')">🗑</button></div>`).join('') ||
       '<div class="empty">Nenhum amigo aqui ainda. Use a aba Adicionar amigo.</div>');
   }
@@ -623,7 +865,7 @@ function openServer(id) {
   const s = currentServer();
   const first = s && s.channels.find((c) => c.type === 'text');
   if (first) openRoom('c:' + first.id);
-  else { curRoom = null; renderAll(); }
+  else { curRoom = null; showVoice = false; renderAll(); }
 }
 
 function openDM(name) {
@@ -631,35 +873,30 @@ function openDM(name) {
   openRoom(dmRoom(name));
 }
 
-function openRoom(room, voiceMode = false) {
+function openRoom(room) {
+  if (curRoom !== room) cancelReply();
   curRoom = room;
-  cancelReply();
   $('#app').classList.remove('nav-open');
   const ch = channelOf(room);
   if (ch && ch.type === 'voice') {
     showVoice = true;
     if (voiceRoom !== room) joinVoice(room);
-  } else if (room.startsWith('d:')) {
-    if (voiceMode) {
-      showVoice = true;
-      if (voiceRoom !== room) joinVoice(room);
-    } else {
-      showVoice = false;
-      loadText(room);
-    }
-  } else {
-    showVoice = false;
-    loadText(room);
+    renderAll();
+    return;
   }
-  renderAll();
+  showVoice = false;
+  loadText(room);
 }
 
 function callAction() {
-  const inCall = curRoom?.startsWith('d:') && voiceRoom === curRoom;
-  if (!inCall) return openRoom(curRoom, true);
-  showVoice = !showVoice;
-  if (!showVoice) loadText(curRoom);
-  else renderAll();
+  if (!curRoom || !curRoom.startsWith('d:')) return;
+  if (voiceRoom === curRoom) {
+    showVoice = !showVoice;
+    if (!showVoice) loadText(curRoom);
+    else renderAll();
+    return;
+  }
+  startCall(otherOf(curRoom));
 }
 
 function goVoice() {
@@ -688,14 +925,14 @@ function joinServer() {
 
 function createChannel(type) {
   const n = (prompt(type === 'voice' ? 'Nome do canal de voz:' : 'Nome do canal de texto:') || '').trim();
-  if (!n) return;
-  socket.emit('create-channel', { serverId: curServer, name: n, type });
+  if (!n || !curServer) return;
+  socket.emit('create-channel', { serverId: curServer, name: n, type }, () => {});
 }
 
 function copyInvite() {
   const link = `${location.origin}/?s=${curServer}`;
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(link).then(() => toast('Link de convite copiado!', 'OK', () => {}));
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => toast('Link de convite copiado!', 'OK', () => {}), () => prompt('Copie o link:', link));
   } else {
     prompt('Copie o link de convite:', link);
   }
@@ -707,7 +944,7 @@ function loadText(room) {
   socket.emit('open-text', { room }, (r) => {
     if (curRoom !== room || showVoice) return;
     $('#msgs').innerHTML = welcome(room);
-    if (!r.ok) return ($('#msgs').innerHTML += `<div class="welcome"><p>${esc(r.error)}</p></div>`);
+    if (!r.ok) { $('#msgs').innerHTML += `<div class="welcome"><p>${esc(r.error)}</p></div>`; return; }
     r.messages.forEach(addMsg);
   });
   renderAll();
@@ -715,7 +952,7 @@ function loadText(room) {
 
 function welcome(room) {
   const dm = room.startsWith('d:');
-  const name = dm ? otherOf(room) : (channelOf(room)?.name || '');
+  const name = dm ? otherOf(room) : (channelOf(room) ? channelOf(room).name : '');
   return `<div class="welcome"><div class="wicon">${dm ? '@' : '#'}</div>
     <h2>${esc(name)}</h2><p>Este é o começo da conversa.</p></div>`;
 }
@@ -738,7 +975,7 @@ function addMsg(m) {
   msgCache.set(m.id, m);
   const box = $('#msgs');
   const last = box.lastElementChild;
-  const cont = last?.classList.contains('msg') && last.dataset.author === m.author &&
+  const cont = !!last && last.classList.contains('msg') && last.dataset.author === m.author &&
     m.time - Number(last.dataset.time) < 420000 && !m.replyTo;
   const div = document.createElement('div');
   div.className = 'msg ' + (cont ? 'cont' : 'first');
@@ -785,8 +1022,8 @@ $('#chatForm').addEventListener('submit', (e) => {
   const input = $('#chatInput');
   const text = input.value.trim();
   if (!text || !curRoom) return;
-  socket.emit('send', { room: curRoom, text, replyTo: replyTo?.id || null }, (r) => {
-    if (!r.ok) toast(r.error, 'OK', () => {});
+  socket.emit('send', { room: curRoom, text, replyTo: replyTo ? replyTo.id : null }, (r) => {
+    if (r && !r.ok) toast(r.error, 'OK', () => {});
   });
   input.value = '';
   cancelReply();
@@ -804,7 +1041,7 @@ socket.on('reaction', ({ room, msgId, reactions }) => {
   updateMsg(m);
 });
 
-/* ---------- Voz (malha WebRTC) ---------- */
+/* ---------- Voz ---------- */
 async function getMedia() {
   try {
     return await navigator.mediaDevices.getUserMedia({ audio: true, video: { width: 640, height: 360 } });
@@ -813,29 +1050,40 @@ async function getMedia() {
   }
 }
 
-async function joinVoice(room) {
+async function joinVoice(room, onJoined, onFail) {
+  if (joining) return;
   if (voiceRoom) leaveVoice(true);
+  joining = true;
   let stream;
   try {
     stream = await getMedia();
   } catch {
-    toast('Não consegui acessar o microfone. Confira as permissões.', 'OK', () => {});
+    joining = false;
+    toast('Não consegui acessar o microfone. Confira as permissões do navegador.', 'OK', () => {});
+    if (onFail) onFail();
     if (showVoice) { showVoice = false; renderAll(); }
     return;
   }
+  joining = false;
   localStream = stream;
   voiceRoom = room;
   micOn = true;
   deaf = false;
   camOn = stream.getVideoTracks().length > 0;
   $('#localVid').srcObject = stream;
-  $('#localTile').classList.toggle('off', !camOn);
+  $('#localVid').play().catch(() => {});
   socket.emit('join-voice', { room }, (r) => {
-    if (!r.ok) return leaveVoice(true);
+    if (!r || !r.ok) {
+      leaveVoice(true);
+      toast('Não foi possível entrar na sala.', 'OK', () => {});
+      if (onFail) onFail();
+      return;
+    }
     r.peers.forEach(({ sid, name }) => {
       peerNames.set(sid, name);
       callPeer(sid);
     });
+    if (onJoined) onJoined();
   });
   renderAll();
 }
@@ -847,13 +1095,10 @@ function leaveVoice(silent = false) {
   cleanupVoice();
   voiceRoom = null;
   if (!silent && curRoom === was) {
-    if (was.startsWith('d:')) {
-      showVoice = false;
-      return loadText(was);
-    }
+    if (was.startsWith('d:')) { showVoice = false; loadText(was); return; }
     const s = currentServer();
-    const t = s?.channels.find((c) => c.type === 'text');
-    if (t) return openRoom('c:' + t.id);
+    const t = s && s.channels.find((c) => c.type === 'text');
+    if (t) { openRoom('c:' + t.id); return; }
     curRoom = null;
     showVoice = false;
   }
@@ -862,16 +1107,30 @@ function leaveVoice(silent = false) {
 
 function cleanupVoice() {
   peers.forEach((_, sid) => closePeer(sid));
+  remoteMedia.clear();
   peerNames.clear();
-  localStream?.getTracks().forEach((t) => t.stop());
+  stopTimer();
+  if (localStream) localStream.getTracks().forEach((t) => t.stop());
   localStream = null;
   stopScreen();
   $('#localVid').srcObject = null;
 }
 
+function attachLocal(p) {
+  const a = localStream ? localStream.getAudioTracks()[0] : null;
+  const v = localStream ? localStream.getVideoTracks()[0] : null;
+  p.tx.audio.sender.replaceTrack(micOn ? a || null : null).catch(() => {});
+  p.tx.cam.sender.replaceTrack(camOn ? v || null : null).catch(() => {});
+  p.tx.screen.sender.replaceTrack(screenStream ? screenStream.getVideoTracks()[0] : null).catch(() => {});
+}
+
+function sendMedia(sid) {
+  socket.emit('signal', { to: sid, data: { media: { cam: camOn && !!localStream && localStream.getVideoTracks().length > 0, screen: !!screenStream } } });
+}
+
 function makePeer(sid) {
   const pc = new RTCPeerConnection(RTC);
-  // Três transceivers fixos (áudio, câmera, tela): trocar a faixa depois usa replaceTrack, sem renegociar
+  // Três transceivers fixos (áudio, câmera, tela): trocar a faixa depois não exige renegociar
   const tx = {
     audio: pc.addTransceiver('audio', { direction: 'sendrecv' }),
     cam: pc.addTransceiver('video', { direction: 'sendrecv' }),
@@ -879,16 +1138,14 @@ function makePeer(sid) {
   };
   const p = { pc, tx, els: [], pending: [] };
   peers.set(sid, p);
-
-  tx.audio.sender.replaceTrack(localStream?.getAudioTracks()[0] || null).catch(() => {});
-  tx.cam.sender.replaceTrack(camOn ? localStream?.getVideoTracks()[0] || null : null).catch(() => {});
-  if (screenStream) tx.screen.sender.replaceTrack(screenStream.getVideoTracks()[0]).catch(() => {});
+  attachLocal(p);
 
   pc.onicecandidate = (e) => {
     if (e.candidate) socket.emit('signal', { to: sid, data: { candidate: e.candidate } });
   };
 
   pc.ontrack = (e) => {
+    if (voiceRoom && voiceRoom.startsWith('d:')) startTimer();
     if (e.track.kind === 'audio') {
       const a = document.createElement('audio');
       a.autoplay = true;
@@ -896,37 +1153,40 @@ function makePeer(sid) {
       a.muted = deaf;
       a.srcObject = new MediaStream([e.track]);
       document.body.appendChild(a);
+      a.play().catch(() => {});
       p.els.push(a);
       return;
     }
     const screen = e.transceiver === tx.screen;
     const tile = remoteTile(sid, screen);
-    tile.querySelector('video').srcObject = new MediaStream([e.track]);
-    setTileOn(tile, !e.track.muted, screen);
-    e.track.onmute = () => setTileOn(tile, false, screen);
-    e.track.onunmute = () => setTileOn(tile, true, screen);
+    const v = tile.querySelector('video');
+    v.srcObject = new MediaStream([e.track]);
+    v.play().catch(() => {});
+    applyRemote(sid);
   };
 
   return p;
 }
 
 async function callPeer(sid) {
+  if (peers.has(sid)) return;
   const p = makePeer(sid);
+  sendMedia(sid);
   await p.pc.setLocalDescription(await p.pc.createOffer());
   socket.emit('signal', { to: sid, data: { sdp: p.pc.localDescription } });
 }
 
 socket.on('signal', async ({ from, data }) => {
-  // Aviso de câmera/tela ligada ou desligada
   if (data.media) {
-    if ('cam' in data.media) { const t = document.getElementById('c-' + from); if (t) setTileOn(t, data.media.cam, false); }
-    if ('screen' in data.media) { const t = document.getElementById('s-' + from); if (t) setTileOn(t, data.media.screen, true); }
+    remoteMedia.set(from, { cam: !!data.media.cam, screen: !!data.media.screen });
+    applyRemote(from);
     return;
   }
   let p = peers.get(from);
   if (!p) {
     if (!data.sdp || data.sdp.type !== 'offer') return;
     p = makePeer(from);
+    sendMedia(from);
   }
   try {
     if (data.sdp) {
@@ -953,19 +1213,14 @@ function remoteTile(sid, screen) {
   const name = peerNames.get(sid) || 'Pessoa';
   tile = document.createElement('div');
   tile.id = id;
+  tile.className = 'tile' + (screen ? ' screen' : '');
   tile.dataset.peer = sid;
-  tile.className = 'tile' + (screen ? '' : ' off');
   tile.hidden = screen;
-  tile.innerHTML = `<video autoplay playsinline></video>` +
-    (screen ? '' : `<div class="avslot">${av(name, 'av big')}</div>`) +
+  tile.innerHTML = `<video autoplay playsinline style="display:${screen ? 'block' : 'none'}"></video>` +
+    (screen ? '' : `<div class="avslot" style="display:flex">${av(name, 'av big')}</div>`) +
     `<span class="lbl">${esc(name)}${screen ? ' · tela' : ''}</span>`;
   $('#grid').appendChild(tile);
   return tile;
-}
-
-function setTileOn(tile, on, screen) {
-  if (screen) tile.hidden = !on;
-  else tile.classList.toggle('off', !on);
 }
 
 function closePeer(sid) {
@@ -977,21 +1232,22 @@ function closePeer(sid) {
   }
   document.querySelectorAll(`[data-peer="${sid}"]`).forEach((el) => el.remove());
   peerNames.delete(sid);
+  remoteMedia.delete(sid);
 }
 
-/* ---------- Controles ---------- */
 function refreshVoiceButtons() {
   setBtn(micOn, '#btnMic', '#pMic');
   setBtn(camOn, '#btnCam');
   setBtn(!deaf, '#btnDeaf', '#pDeaf');
+  $('#btnCam').hidden = !(localStream && localStream.getVideoTracks().length);
   $('#btnScreen').hidden = !canShare;
   $('#btnScreen').classList.toggle('on', !!screenStream);
-  $('#localTile').classList.toggle('off', !camOn);
-  $('#localAv').innerHTML = state ? av(state.me.username, 'av big') : '';
+  showCam($('#localTile'), camOn);
+  if (state) $('#localAv').innerHTML = av(state.me.username, 'av big');
 }
 
 function toggleMic() {
-  const t = localStream?.getAudioTracks()[0];
+  const t = localStream && localStream.getAudioTracks()[0];
   if (!t) return;
   micOn = !micOn;
   t.enabled = micOn;
@@ -999,13 +1255,13 @@ function toggleMic() {
 }
 
 function toggleCam() {
-  const t = localStream?.getVideoTracks()[0];
+  const t = localStream && localStream.getVideoTracks()[0];
   if (!t) return;
   camOn = !camOn;
   t.enabled = camOn;
   peers.forEach((p, sid) => {
     p.tx.cam.sender.replaceTrack(camOn ? t : null).catch(() => {});
-    socket.emit('signal', { to: sid, data: { media: { cam: camOn } } });
+    sendMedia(sid);
   });
   refreshVoiceButtons();
 }
@@ -1034,10 +1290,11 @@ async function toggleScreen() {
   const track = s.getVideoTracks()[0];
   track.onended = () => stopScreen();
   $('#localScreen').srcObject = s;
+  $('#localScreen').play().catch(() => {});
   $('#localScreenTile').hidden = false;
   peers.forEach((p, sid) => {
     p.tx.screen.sender.replaceTrack(track).catch(() => {});
-    socket.emit('signal', { to: sid, data: { media: { screen: true } } });
+    sendMedia(sid);
   });
   refreshVoiceButtons();
 }
@@ -1048,7 +1305,7 @@ function stopScreen() {
   screenStream = null;
   peers.forEach((p, sid) => {
     p.tx.screen.sender.replaceTrack(null).catch(() => {});
-    socket.emit('signal', { to: sid, data: { media: { screen: false } } });
+    sendMedia(sid);
   });
   $('#localScreen').srcObject = null;
   $('#localScreenTile').hidden = true;
@@ -1097,6 +1354,5 @@ $('#avFile').addEventListener('change', (e) => {
 $('#emojiRow').innerHTML = EMOJIS.map((e) => `<button type="button" onclick="insertEmoji('${e}')">${e}</button>`).join('');
 setAuthMode('login');
 </script>
-<script src="/fix.js"></script>
 </body>
 </html>

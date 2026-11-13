@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(process.env.DATA_DIR || __dirname, 'data.json');
 const THEMES = ['escuro', 'claro', 'roxo', 'oceano', 'floresta'];
 const REACTS = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👀'];
+const CALL_TIMEOUT = 45000;
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +28,7 @@ function save() {
 // ----- Estado em memória -----
 const userSockets = new Map(); // usuário -> Set de ids de socket
 const voiceRooms = new Map();  // sala de voz -> Map(socketId -> usuário)
+const pendingCalls = new Map(); // quem liga -> { to, room, timer }
 
 const uid = () => crypto.randomBytes(6).toString('hex');
 const clean = (t, max = 500) => String(t ?? '').trim().slice(0, max);
@@ -36,10 +38,19 @@ const hashPass = (pw, salt) => crypto.scryptSync(String(pw), salt, 64).toString(
 const avatarOk = (a) =>
   typeof a === 'string' && a.length < 300000 && /^data:image\/(png|jpeg|webp);base64,/.test(a) ? a : '';
 
+function sendTo(user, ev, data) {
+  userSockets.get(user)?.forEach((sid) => io.to(sid).emit(ev, data));
+}
+
 // ----- Salas de voz -----
 function roomUsers(room) {
   const m = voiceRooms.get(room);
   return m ? [...new Set(m.values())] : [];
+}
+
+function inCall(user) {
+  for (const m of voiceRooms.values()) if ([...m.values()].includes(user)) return true;
+  return false;
 }
 
 function leaveVoice(socket) {
@@ -53,6 +64,27 @@ function leaveVoice(socket) {
     if (!m.size) voiceRooms.delete(room);
   }
   pushAll();
+}
+
+// ----- Chamadas 1 a 1 -----
+function endPending(caller) {
+  const c = pendingCalls.get(caller);
+  if (!c) return null;
+  clearTimeout(c.timer);
+  pendingCalls.delete(caller);
+  return c;
+}
+
+function dropCalls(user) {
+  for (const [caller, c] of [...pendingCalls]) {
+    if (caller === user) {
+      endPending(caller);
+      sendTo(c.to, 'call-missed', { from: user });
+    } else if (c.to === user) {
+      endPending(caller);
+      sendTo(caller, 'call-declined', { by: user });
+    }
+  }
 }
 
 // ----- Canais, salas e permissões -----
@@ -152,7 +184,13 @@ function detach(socket) {
   if (!user) return;
   socket.data.user = null;
   const set = userSockets.get(user);
-  if (set) { set.delete(socket.id); if (!set.size) userSockets.delete(user); }
+  if (set) {
+    set.delete(socket.id);
+    if (!set.size) {
+      userSockets.delete(user);
+      dropCalls(user);
+    }
+  }
   pushAll();
 }
 
@@ -379,15 +417,7 @@ io.on('connection', (socket) => {
     if (!m) { m = new Map(); voiceRooms.set(p.room, m); }
     const peerList = [...m.entries()].map(([sid, name]) => ({ sid, name }));
 
-    // Avisa os participantes que já estão na sala
     m.forEach((_, sid) => io.to(sid).emit('peer-joined', { sid: socket.id, name: me }));
-
-    // Chamada para amigo: toca na tela do outro quando ninguém está na sala
-    if (r.kind === 'd' && !m.size) {
-      r.parts.filter((x) => x !== me).forEach((u) =>
-        userSockets.get(u)?.forEach((sid) => io.to(sid).emit('ring', { from: me, room: p.room }))
-      );
-    }
 
     m.set(socket.id, me);
     socket.data.voice = p.room;
@@ -402,6 +432,51 @@ io.on('connection', (socket) => {
     const other = io.sockets.sockets.get(p.to);
     if (!socket.data.voice || !other || other.data.voice !== socket.data.voice) return;
     io.to(p.to).emit('signal', { from: socket.id, data: p.data });
+  });
+
+  // ----- Chamadas 1 a 1 (estilo WhatsApp) -----
+  on('call-invite', (p, cb, me) => {
+    const to = String(p.to || '');
+    if (!db.users[to] || !db.users[me].friends.includes(to)) return cb({ ok: false, error: 'Só é possível ligar para amigos.' });
+    if (pendingCalls.has(me) || inCall(me)) return cb({ ok: false, error: 'Você já está em uma chamada.' });
+    if (!online(to)) return cb({ ok: false, error: 'Esta pessoa está offline.' });
+    if (inCall(to)) return cb({ ok: false, error: 'Esta pessoa está em outra chamada.' });
+    const room = 'd:' + dmKey(me, to);
+    const timer = setTimeout(() => {
+      if (endPending(me)) {
+        sendTo(me, 'call-missed', { from: to });
+        sendTo(to, 'call-missed', { from: me });
+      }
+    }, CALL_TIMEOUT);
+    pendingCalls.set(me, { to, room, timer });
+    sendTo(to, 'call-incoming', { from: me, room });
+    cb({ ok: true });
+  });
+
+  on('call-accept', (p, cb, me) => {
+    const c = pendingCalls.get(p.from);
+    if (!c || c.to !== me) return cb({ ok: false, error: 'Chamada não encontrada.' });
+    endPending(p.from);
+    sendTo(p.from, 'call-accepted', { by: me, room: c.room });
+    cb({ ok: true });
+  });
+
+  on('call-decline', (p, cb, me) => {
+    const c = pendingCalls.get(p.from);
+    if (c && c.to === me) {
+      endPending(p.from);
+      sendTo(p.from, 'call-declined', { by: me });
+    }
+    cb({ ok: true });
+  });
+
+  on('call-cancel', (p, cb, me) => {
+    const c = pendingCalls.get(me);
+    if (c) {
+      endPending(me);
+      sendTo(c.to, 'call-missed', { from: me });
+    }
+    cb({ ok: true });
   });
 
   socket.on('disconnect', () => detach(socket));
