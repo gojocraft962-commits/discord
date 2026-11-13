@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 40000;
 const DATA_FILE = path.join(process.env.DATA_DIR || __dirname, 'data.json');
 const THEMES = ['escuro', 'claro', 'roxo', 'oceano', 'floresta'];
 const REACTS = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👀'];
-const CALL_TIMEOUT = 45000;
+const CALL_TIMEOUT = 40000;
 
 const app = express();
 const server = http.createServer(app);
