@@ -12,7 +12,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Gerar APK de teste
+      - name: Compilar APK
         working-directory: android
         run: |
           chmod +x gradlew

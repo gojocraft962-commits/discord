@@ -2,8 +2,5 @@
   "appId": "com.seunome.chatly",
   "appName": "Chatly",
   "webDir": "public",
-  "server": {
-    "url": "https://SEU-SITE.onrender.com",
-    "cleartext": false
-  }
+  "server": { "url": "https://SEU-SITE.onrender.com", "cleartext": false }
 }
