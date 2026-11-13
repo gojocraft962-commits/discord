@@ -5,7 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { Server } = require('socket.io');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 40000;
 const DATA_FILE = path.join(process.env.DATA_DIR || __dirname, 'data.json');
 const THEMES = ['escuro', 'claro', 'roxo', 'oceano', 'floresta'];
 const REACTS = ['👍', '❤️', '😂', '😮', '😢', '🎉', '🔥', '👀'];
